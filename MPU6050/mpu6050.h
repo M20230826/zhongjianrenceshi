@@ -1,9 +1,6 @@
 #ifndef __MPU6050_H
 #define __MPU6050_H
-  /**************************************************************************
-���ߣ�ƽ��С��֮��
-�ҵ��Ա�С�꣺http://shop114407458.taobao.com/
-**************************************************************************/
+
 #include "sys.h"
 #define devAddr  0xD0
 
@@ -356,20 +353,33 @@
 
 #define MPU6050_WHO_AM_I_BIT        6
 #define MPU6050_WHO_AM_I_LENGTH     6
-extern	short gyro[3], accel[3];
-extern int16_t Gx_offset,Gy_offset,Gz_offset;
-extern float Acc1G_Values; 
-extern float Pitch,Roll; 
-//���ⲿ���õ�API
-void MPU6050_initialize(void); //��ʼ��
-uint8_t MPU6050_testConnection(void); //���MPU6050�Ƿ����
-//��ȡADCֵ
-void MPU6050_getMotion6(int16_t* ax, int16_t* ay, int16_t* az, int16_t* gx, int16_t* gy, int16_t* gz);
-void MPU6050_getlastMotion6(int16_t* ax, int16_t* ay, 
-		int16_t* az, int16_t* gx, int16_t* gy, int16_t* gz);
-uint8_t MPU6050_getDeviceID(void); //��ȡMPU6050��ID
-void MPU6050_InitGyro_Offset(void);//��ʼ��������ƫ��
-void DMP_Init(void);
-void Read_DMP(void);
-int Read_Temperature(void);
-#endif
+
+// 声明外部变量，用于存储陀螺仪和加速度计的数据
+extern int16_t gyro[3];     // 陀螺仪数据数组
+extern int16_t accel[3];    // 加速度计数据数组
+
+// 声明外部变量，用于存储陀螺仪的偏移值
+extern int16_t Gx_offset;   // 陀螺仪X轴偏移
+extern int16_t Gy_offset;   // 陀螺仪Y轴偏移
+extern int16_t Gz_offset;   // 陀螺仪Z轴偏移
+
+// 声明外部变量，用于存储加速度计的1G值
+extern float Acc1G_Values;  // 加速度计1G值
+
+// 声明外部变量，用于存储姿态角
+extern float Roll;          // 横滚角
+extern float Pitch;         // 俯仰角
+extern float Yaw;           // 偏航角
+
+// MPU6050 API函数声明
+void MPU6050_initialize(void); // 初始化MPU6050
+uint8_t MPU6050_testConnection(void); // 测试MPU6050连接
+void MPU6050_getMotion6(int16_t* ax, int16_t* ay, int16_t* az, int16_t* gx, int16_t* gy, int16_t* gz); // 获取加速度计和陀螺仪数据
+void MPU6050_getlastMotion6(int16_t* ax, int16_t* ay, int16_t* az, int16_t* gx, int16_t* gy, int16_t* gz); // 获取上一次的加速度计和陀螺仪数据
+uint8_t MPU6050_getDeviceID(void); // 获取MPU6050设备ID
+void MPU6050_InitGyro_Offset(void); // 初始化陀螺仪偏移
+void DMP_Init(void); // 初始化DMP
+void Read_DMP(void); // 读取DMP数据
+int Read_Temperature(void); // 读取温度
+
+#endif // __MPU6050_H

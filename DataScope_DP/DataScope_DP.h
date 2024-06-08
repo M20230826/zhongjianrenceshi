@@ -1,21 +1,9 @@
-  /**************************************************************************
-×÷Õß£ºÆ½ºâĞ¡³µÖ®¼Ò
-ÎÒµÄÌÔ±¦Ğ¡µê£ºhttp://shop114407458.taobao.com/
-**************************************************************************/
+#ifndef __DATA_PROTOCOL_H
+#define __DATA_PROTOCOL_H
 
-#ifndef __DATA_PRTOCOL_H
-#define __DATA_PRTOCOL_H
- 
- 
-extern unsigned char DataScope_OutPut_Buffer[42];	   //´ı·¢ËÍÖ¡Êı¾İ»º´æÇø
+extern unsigned char DataScope_OutPut_Buffer[42]; // è¾“å‡ºç¼“å†²åŒº
 
+void DataScope_Get_Channel_Data(float data, unsigned char channel); // è·å–é€šé“æ•°æ®
+unsigned char DataScope_Data_Generate(unsigned char channel_number); // ç”Ÿæˆæ•°æ®å¸§
 
-void DataScope_Get_Channel_Data(float Data,unsigned char Channel);    // Ğ´Í¨µÀÊı¾İÖÁ ´ı·¢ËÍÖ¡Êı¾İ»º´æÇø
-
-unsigned char DataScope_Data_Generate(unsigned char Channel_Number);  // ·¢ËÍÖ¡Êı¾İÉú³Éº¯Êı 
- 
- 
-#endif 
-
-
-
+#endif

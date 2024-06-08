@@ -1,373 +1,7 @@
-//#include "MPU6050.h"
-//#include "IOI2C.h"
-//#include "usart.h"
-//#define PRINT_ACCEL     (0x01)
-//#define PRINT_GYRO      (0x02)
-//#define PRINT_QUAT      (0x04)
-//#define ACCEL_ON        (0x01)
-//#define GYRO_ON         (0x02)
-//#define MOTION          (0)
-//#define NO_MOTION       (1)
-//#define DEFAULT_MPU_HZ  (200)
-//#define FLASH_SIZE      (512)
-//#define FLASH_MEM_START ((void*)0x1800)
-//#define q30  1073741824.0f
-//short gyro[3], accel[3], sensors;
-//float Pitch,Roll; 
-//float q0=1.0f,q1=0.0f,q2=0.0f,q3=0.0f;
-//static signed char gyro_orientation[9] = {-1, 0, 0,
-//                                           0,-1, 0,
-//                                           0, 0, 1};
-
-//static  unsigned short inv_row_2_scale(const signed char *row)
-//{
-//    unsigned short b;
-
-//    if (row[0] > 0)
-//        b = 0;
-//    else if (row[0] < 0)
-//        b = 4;
-//    else if (row[1] > 0)
-//        b = 1;
-//    else if (row[1] < 0)
-//        b = 5;
-//    else if (row[2] > 0)
-//        b = 2;
-//    else if (row[2] < 0)
-//        b = 6;
-//    else
-//        b = 7;      // error
-//    return b;
-//}
-
-
-//static  unsigned short inv_orientation_matrix_to_scalar(
-//    const signed char *mtx)
-//{
-//    unsigned short scalar;
-//    scalar = inv_row_2_scale(mtx);
-//    scalar |= inv_row_2_scale(mtx + 3) << 3;
-//    scalar |= inv_row_2_scale(mtx + 6) << 6;
-
-
-//    return scalar;
-//}
-
-//static void run_self_test(void)
-//{
-//    int result;
-//    long gyro[3], accel[3];
-
-//    result = mpu_run_self_test(gyro, accel);
-//    if (result == 0x7) {
-//        /* Test passed. We can trust the gyro data here, so let's push it down
-//         * to the DMP.
-//         */
-//        float sens;
-//        unsigned short accel_sens;
-//        mpu_get_gyro_sens(&sens);
-//        gyro[0] = (long)(gyro[0] * sens);
-//        gyro[1] = (long)(gyro[1] * sens);
-//        gyro[2] = (long)(gyro[2] * sens);
-//        dmp_set_gyro_bias(gyro);
-//        mpu_get_accel_sens(&accel_sens);
-//        accel[0] *= accel_sens;
-//        accel[1] *= accel_sens;
-//        accel[2] *= accel_sens;
-//        dmp_set_accel_bias(accel);
-//		printf("setting bias succesfully ......\r\n");
-//    }
-//}
-
-
-
-//uint8_t buffer[14];
-
-//int16_t  MPU6050_FIFO[6][11];
-//int16_t Gx_offset=0,Gy_offset=0,Gz_offset=0;
-
-
-
-///**************************************************************************
-//Function: The new ADC data is updated to FIFO array for filtering
-//Input   : ax£¬ay£¬az£ºx£¬y, z-axis acceleration data£»gx£¬gy£¬gz£ºx. Y, z-axis angular acceleration data
-//Output  : none
-//º¯Êı¹¦ÄÜ£º½«ĞÂµÄADCÊı¾İ¸üĞÂµ½ FIFOÊı×é£¬½øĞĞÂË²¨´¦Àí
-//Èë¿Ú²ÎÊı£ºax£¬ay£¬az£ºx£¬y£¬zÖá¼ÓËÙ¶ÈÊı¾İ£»gx£¬gy£¬gz£ºx£¬y£¬zÖá½Ç¼ÓËÙ¶ÈÊı¾İ
-//·µ»Ø  Öµ£ºÎŞ
-//**************************************************************************/
-
-//void  MPU6050_newValues(int16_t ax,int16_t ay,int16_t az,int16_t gx,int16_t gy,int16_t gz)
-//{
-//unsigned char i ;
-//int32_t sum=0;
-//for(i=1;i<10;i++){	//FIFO ²Ù×÷
-//MPU6050_FIFO[0][i-1]=MPU6050_FIFO[0][i];
-//MPU6050_FIFO[1][i-1]=MPU6050_FIFO[1][i];
-//MPU6050_FIFO[2][i-1]=MPU6050_FIFO[2][i];
-//MPU6050_FIFO[3][i-1]=MPU6050_FIFO[3][i];
-//MPU6050_FIFO[4][i-1]=MPU6050_FIFO[4][i];
-//MPU6050_FIFO[5][i-1]=MPU6050_FIFO[5][i];
-//}
-//MPU6050_FIFO[0][9]=ax;//½«ĞÂµÄÊı¾İ·ÅÖÃµ½ Êı¾İµÄ×îºóÃæ
-//MPU6050_FIFO[1][9]=ay;
-//MPU6050_FIFO[2][9]=az;
-//MPU6050_FIFO[3][9]=gx;
-//MPU6050_FIFO[4][9]=gy;
-//MPU6050_FIFO[5][9]=gz;
-
-//sum=0;
-//for(i=0;i<10;i++){	//Çóµ±Ç°Êı×éµÄºÏ£¬ÔÙÈ¡Æ½¾ùÖµ
-//   sum+=MPU6050_FIFO[0][i];
-//}
-//MPU6050_FIFO[0][10]=sum/10;
-
-//sum=0;
-//for(i=0;i<10;i++){
-//   sum+=MPU6050_FIFO[1][i];
-//}
-//MPU6050_FIFO[1][10]=sum/10;
-
-//sum=0;
-//for(i=0;i<10;i++){
-//   sum+=MPU6050_FIFO[2][i];
-//}
-//MPU6050_FIFO[2][10]=sum/10;
-
-//sum=0;
-//for(i=0;i<10;i++){
-//   sum+=MPU6050_FIFO[3][i];
-//}
-//MPU6050_FIFO[3][10]=sum/10;
-
-//sum=0;
-//for(i=0;i<10;i++){
-//   sum+=MPU6050_FIFO[4][i];
-//}
-//MPU6050_FIFO[4][10]=sum/10;
-
-//sum=0;
-//for(i=0;i<10;i++){
-//   sum+=MPU6050_FIFO[5][i];
-//}
-//MPU6050_FIFO[5][10]=sum/10;
-//}
-
-///**************************************************************************
-//Function: Setting the clock source of mpu6050
-//Input   : source£ºClock source number
-//Output  : none
-//º¯Êı¹¦ÄÜ£ºÉèÖÃ  MPU6050 µÄÊ±ÖÓÔ´
-//Èë¿Ú²ÎÊı£ºsource£ºÊ±ÖÓÔ´±àºÅ
-//·µ»Ø  Öµ£ºÎŞ
-// * CLK_SEL | Clock Source
-// * --------+--------------------------------------
-// * 0       | Internal oscillator
-// * 1       | PLL with X Gyro reference
-// * 2       | PLL with Y Gyro reference
-// * 3       | PLL with Z Gyro reference
-// * 4       | PLL with external 32.768kHz reference
-// * 5       | PLL with external 19.2MHz reference
-// * 6       | Reserved
-// * 7       | Stops the clock and keeps the timing generator in reset
-//**************************************************************************/
-//void MPU6050_setClockSource(uint8_t source){
-//    IICwriteBits(devAddr, MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH, source);
-
-//}
-
-///** Set full-scale gyroscope range.
-// * @param range New full-scale gyroscope range value
-// * @see getFullScaleRange()
-// * @see MPU6050_GYRO_FS_250
-// * @see MPU6050_RA_GYRO_CONFIG
-// * @see MPU6050_GCONFIG_FS_SEL_BIT
-// * @see MPU6050_GCONFIG_FS_SEL_LENGTH
-// */
-//void MPU6050_setFullScaleGyroRange(uint8_t range) {
-//    IICwriteBits(devAddr, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, range);
-//}
-
-///**************************************************************************
-//Function: Setting the maximum range of mpu6050 accelerometer
-//Input   : range£ºAcceleration maximum range number
-//Output  : none
-//º¯Êı¹¦ÄÜ£ºÉèÖÃ MPU6050 ¼ÓËÙ¶È¼ÆµÄ×î´óÁ¿³Ì
-//Èë¿Ú²ÎÊı£ºrange£º¼ÓËÙ¶È×î´óÁ¿³Ì±àºÅ
-//·µ»Ø  Öµ£ºÎŞ
-//**************************************************************************/
-////#define MPU6050_ACCEL_FS_2          0x00  		//===×î´óÁ¿³Ì+-2G
-////#define MPU6050_ACCEL_FS_4          0x01			//===×î´óÁ¿³Ì+-4G
-////#define MPU6050_ACCEL_FS_8          0x02			//===×î´óÁ¿³Ì+-8G
-////#define MPU6050_ACCEL_FS_16         0x03			//===×î´óÁ¿³Ì+-16G
-//void MPU6050_setFullScaleAccelRange(uint8_t range) {
-//    IICwriteBits(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_AFS_SEL_BIT, MPU6050_ACONFIG_AFS_SEL_LENGTH, range);
-//}
-
-///**************************************************************************
-//Function: Set mpu6050 to sleep mode or not
-//Input   : enable£º1£¬sleep£»0£¬work£»
-//Output  : none
-//º¯Êı¹¦ÄÜ£ºÉèÖÃ MPU6050 ÊÇ·ñ½øÈëË¯ÃßÄ£Ê½
-//Èë¿Ú²ÎÊı£ºenable£º1£¬Ë¯¾õ£»0£¬¹¤×÷£»
-//·µ»Ø  Öµ£ºÎŞ
-//**************************************************************************/
-//void MPU6050_setSleepEnabled(uint8_t enabled) {
-//    IICwriteBit(devAddr, MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, enabled);
-//}
-
-///**************************************************************************
-//Function: Read identity
-//Input   : none
-//Output  : 0x68
-//º¯Êı¹¦ÄÜ£º¶ÁÈ¡  MPU6050 WHO_AM_I ±êÊ¶
-//Èë¿Ú²ÎÊı£ºÎŞ
-//·µ»Ø  Öµ£º0x68
-//**************************************************************************/
-//uint8_t MPU6050_getDeviceID(void) {
-
-//    IICreadBytes(devAddr, MPU6050_RA_WHO_AM_I, 1, buffer);
-//    return buffer[0];
-//}
-
-///**************************************************************************
-//Function: Check whether mpu6050 is connected
-//Input   : none
-//Output  : 1£ºConnected£»0£ºNot connected
-//º¯Êı¹¦ÄÜ£º¼ì²âMPU6050 ÊÇ·ñÒÑ¾­Á¬½Ó
-//Èë¿Ú²ÎÊı£ºÎŞ
-//·µ»Ø  Öµ£º1£ºÒÑÁ¬½Ó£»0£ºÎ´Á¬½Ó
-//**************************************************************************/
-//uint8_t MPU6050_testConnection(void) {
-//   if(MPU6050_getDeviceID() == 0x68)  //0b01101000;
-//   return 1;
-//   	else return 0;
-//}
-
-///**************************************************************************
-//Function: Setting whether mpu6050 is the host of aux I2C cable
-//Input   : enable£º1£¬yes£»0;not
-//Output  : none
-//º¯Êı¹¦ÄÜ£ºÉèÖÃ MPU6050 ÊÇ·ñÎªAUX I2CÏßµÄÖ÷»ú
-//Èë¿Ú²ÎÊı£ºenable£º1£¬ÊÇ£»0£º·ñ
-//·µ»Ø  Öµ£ºÎŞ
-//**************************************************************************/
-//void MPU6050_setI2CMasterModeEnabled(uint8_t enabled) {
-//    IICwriteBit(devAddr, MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_I2C_MST_EN_BIT, enabled);
-//}
-
-///**************************************************************************
-//Function: Setting whether mpu6050 is the host of aux I2C cable
-//Input   : enable£º1£¬yes£»0;not
-//Output  : none
-//º¯Êı¹¦ÄÜ£ºÉèÖÃ MPU6050 ÊÇ·ñÎªAUX I2CÏßµÄÖ÷»ú
-//Èë¿Ú²ÎÊı£ºenable£º1£¬ÊÇ£»0£º·ñ
-//·µ»Ø  Öµ£ºÎŞ
-//**************************************************************************/
-//void MPU6050_setI2CBypassEnabled(uint8_t enabled) {
-//    IICwriteBit(devAddr, MPU6050_RA_INT_PIN_CFG, MPU6050_INTCFG_I2C_BYPASS_EN_BIT, enabled);
-//}
-
-///**************************************************************************
-//Function: initialization Mpu6050 to enter the available state
-//Input   : none
-//Output  : none
-//º¯Êı¹¦ÄÜ£º³õÊ¼»¯	MPU6050 ÒÔ½øÈë¿ÉÓÃ×´Ì¬
-//Èë¿Ú²ÎÊı£ºÎŞ
-//·µ»Ø  Öµ£ºÎŞ
-//**************************************************************************/
-//void MPU6050_initialize(void) {
-//    MPU6050_setClockSource(MPU6050_CLOCK_PLL_YGYRO); //ÉèÖÃÊ±ÖÓ
-//    MPU6050_setFullScaleGyroRange(MPU6050_GYRO_FS_2000);//ÍÓÂİÒÇÁ¿³ÌÉèÖÃ
-//    MPU6050_setFullScaleAccelRange(MPU6050_ACCEL_FS_2);	//¼ÓËÙ¶È¶È×î´óÁ¿³Ì +-2G
-//    MPU6050_setSleepEnabled(0); //½øÈë¹¤×÷×´Ì¬
-//	  MPU6050_setI2CMasterModeEnabled(0);	 //²»ÈÃMPU6050 ¿ØÖÆAUXI2C
-//	  MPU6050_setI2CBypassEnabled(0);	 //Ö÷¿ØÖÆÆ÷µÄI2CÓë	MPU6050µÄAUXI2C	Ö±Í¨¹Ø±Õ
-//}
-
-///**************************************************************************
-//Function: Initialization of DMP in mpu6050
-//Input   : none
-//Output  : none
-//º¯Êı¹¦ÄÜ£ºMPU6050ÄÚÖÃDMPµÄ³õÊ¼»¯
-//Èë¿Ú²ÎÊı£ºÎŞ
-//·µ»Ø  Öµ£ºÎŞ
-//**************************************************************************/
-//void DMP_Init(void)
-//{ 
-//   u8 temp[1]={0};
-//   i2cRead(0x68,0x75,1,temp);
-//	 printf("mpu_set_sensor complete ......\r\n");
-//	if(temp[0]!=0x68)NVIC_SystemReset();
-//	if(!mpu_init())
-//  {
-//	  if(!mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL))
-//	  	 printf("mpu_set_sensor complete ......\r\n");
-//	  if(!mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL))
-//	  	 printf("mpu_configure_fifo complete ......\r\n");
-//	  if(!mpu_set_sample_rate(DEFAULT_MPU_HZ))
-//	  	 printf("mpu_set_sample_rate complete ......\r\n");
-//	  if(!dmp_load_motion_driver_firmware())
-//	  	printf("dmp_load_motion_driver_firmware complete ......\r\n");
-//	  if(!dmp_set_orientation(inv_orientation_matrix_to_scalar(gyro_orientation)))
-//	  	 printf("dmp_set_orientation complete ......\r\n");
-//	  if(!dmp_enable_feature(DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_TAP |
-//	        DMP_FEATURE_ANDROID_ORIENT | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO |
-//	        DMP_FEATURE_GYRO_CAL))
-//	  	 printf("dmp_enable_feature complete ......\r\n");
-//	  if(!dmp_set_fifo_rate(DEFAULT_MPU_HZ))
-//	  	 printf("dmp_set_fifo_rate complete ......\r\n");
-//	  run_self_test();
-//	  if(!mpu_set_dmp_state(1))
-//	  	 printf("mpu_set_dmp_state complete ......\r\n");
-//  }
-//}
-///**************************************************************************
-//Function: Read the attitude information of DMP in mpu6050
-//Input   : none
-//Output  : none
-//º¯Êı¹¦ÄÜ£º¶ÁÈ¡MPU6050ÄÚÖÃDMPµÄ×ËÌ¬ĞÅÏ¢
-//Èë¿Ú²ÎÊı£ºÎŞ
-//·µ»Ø  Öµ£ºÎŞ
-//**************************************************************************/
-//void Read_DMP(void)
-//{	
-//	  unsigned long sensor_timestamp;
-//		unsigned char more;
-//		long quat[4];
-
-//				dmp_read_fifo(gyro, accel, quat, &sensor_timestamp, &sensors, &more);		//¶ÁÈ¡DMPÊı¾İ
-//				if (sensors & INV_WXYZ_QUAT )
-//				{    
-//					 q0=quat[0] / q30;
-//					 q1=quat[1] / q30;
-//					 q2=quat[2] / q30;
-//					 q3=quat[3] / q30;  //ËÄÔªÊı
-//					 Pitch = asin(-2 * q1 * q3 + 2 * q0* q2)* 57.3; 	//¼ÆËã³ö¸©Ñö½Ç
-//					 Roll = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)* 57.3; // ¼ÆËã³öºá¹ö½Ç
-//				}
-
-//}
-///**************************************************************************
-//Function: Read mpu6050 built-in temperature sensor data
-//Input   : none
-//Output  : Centigrade temperature
-//º¯Êı¹¦ÄÜ£º¶ÁÈ¡MPU6050ÄÚÖÃÎÂ¶È´«¸ĞÆ÷Êı¾İ
-//Èë¿Ú²ÎÊı£ºÎŞ
-//·µ»Ø  Öµ£ºÉãÊÏÎÂ¶È
-//**************************************************************************/
-//int Read_Temperature(void)
-//{	   
-//	  float Temp;
-//	  Temp=(I2C_ReadOneByte(devAddr,MPU6050_RA_TEMP_OUT_H)<<8)+I2C_ReadOneByte(devAddr,MPU6050_RA_TEMP_OUT_L);
-//		if(Temp>32768) Temp-=65536;
-//		Temp=(36.53+Temp/340)*10;	//ÎÂ¶È·Å´óÊ®±¶´æ·Å
-//	  return (int)Temp;
-//}
-////------------------End of File----------------------------
 #include "MPU6050.h"
 #include "IOI2C.h"
 #include "usart.h"
+
 #define PRINT_ACCEL     (0x01)
 #define PRINT_GYRO      (0x02)
 #define PRINT_QUAT      (0x04)
@@ -379,14 +13,26 @@
 #define FLASH_SIZE      (512)
 #define FLASH_MEM_START ((void*)0x1800)
 #define q30  1073741824.0f
-short gyro[3], accel[3], sensors;
-float Pitch,Roll; 
-float q0=1.0f,q1=0.0f,q2=0.0f,q3=0.0f;
-static signed char gyro_orientation[9] = {-1, 0, 0,
-                                           0,-1, 0,
-                                           0, 0, 1};
+#define MPU6050_ADDRESS 0x68  // æˆ– 0x69ï¼Œå–å†³äºä½ çš„ç¡¬ä»¶è¿æ¥
 
-static  unsigned short inv_row_2_scale(const signed char *row)
+short gyro[3], accel[3], sensors;
+float Roll, Pitch, Yaw; 
+float q0 = 1.0f, q1 = 0.0f, q2 = 0.0f, q3 = 0.0f;
+
+static signed char gyro_orientation[9] = {
+    -1, 0, 0,
+     0, -1, 0,
+     0, 0, 1
+};
+/**************************************************************************
+å‡½æ•°å: inv_row_2_scale
+æè¿°  : å°†è¡Œå‘é‡è½¬æ¢ä¸ºæ¯”ä¾‹
+è¾“å…¥  : row - è¡Œå‘é‡
+è¾“å‡º  : b - è½¬æ¢åçš„æ¯”ä¾‹
+è¯´æ˜  :
+ - å°†è¡Œå‘é‡è½¬æ¢ä¸ºæ¯”ä¾‹ç”¨äºæ–¹å‘çŸ©é˜µçš„å¤„ç†ã€‚
+**************************************************************************/
+static unsigned short inv_row_2_scale(const signed char *row)
 {
     unsigned short b;
 
@@ -403,23 +49,35 @@ static  unsigned short inv_row_2_scale(const signed char *row)
     else if (row[2] < 0)
         b = 6;
     else
-        b = 7;      // error
+        b = 7;  // é”™è¯¯
     return b;
 }
 
-
-static  unsigned short inv_orientation_matrix_to_scalar(
-    const signed char *mtx)
+/**************************************************************************
+å‡½æ•°å: inv_orientation_matrix_to_scalar
+æè¿°  : å°†æ–¹å‘çŸ©é˜µè½¬æ¢ä¸ºæ ‡é‡
+è¾“å…¥  : mtx - æ–¹å‘çŸ©é˜µ
+è¾“å‡º  : scalar - è½¬æ¢åçš„æ ‡é‡
+è¯´æ˜  :
+ - å°†æ–¹å‘çŸ©é˜µè½¬æ¢ä¸ºæ ‡é‡ç”¨äºæ–¹å‘çŸ©é˜µçš„å¤„ç†ã€‚
+**************************************************************************/
+static unsigned short inv_orientation_matrix_to_scalar(const signed char *mtx)
 {
     unsigned short scalar;
     scalar = inv_row_2_scale(mtx);
     scalar |= inv_row_2_scale(mtx + 3) << 3;
     scalar |= inv_row_2_scale(mtx + 6) << 6;
 
-
     return scalar;
 }
-
+/**************************************************************************
+å‡½æ•°å: run_self_test
+æè¿°  : è¿è¡Œè‡ªæ£€
+è¾“å…¥  : æ— 
+è¾“å‡º  : æ— 
+è¯´æ˜  :
+ - è¿è¡ŒMPU6050çš„è‡ªæ£€ï¼Œå¹¶è®¾ç½®é™€èºä»ªå’ŒåŠ é€Ÿåº¦è®¡çš„åç½®ã€‚
+**************************************************************************/
 static void run_self_test(void)
 {
     int result;
@@ -427,9 +85,7 @@ static void run_self_test(void)
 
     result = mpu_run_self_test(gyro, accel);
     if (result == 0x7) {
-        /* Test passed. We can trust the gyro data here, so let's push it down
-         * to the DMP.
-         */
+        /* æµ‹è¯•é€šè¿‡ã€‚æˆ‘ä»¬å¯ä»¥ä¿¡ä»»è¿™é‡Œçš„é™€èºä»ªæ•°æ®ï¼Œå› æ­¤å°†å…¶æ¨é€åˆ°DMPã€‚ */
         float sens;
         unsigned short accel_sens;
         mpu_get_gyro_sens(&sens);
@@ -442,251 +98,256 @@ static void run_self_test(void)
         accel[1] *= accel_sens;
         accel[2] *= accel_sens;
         dmp_set_accel_bias(accel);
-		printf("setting bias succesfully ......\r\n");
+        //printf("setting bias successfully ......\r\n");
     }
 }
-
-
-
 uint8_t buffer[14];
+int16_t MPU6050_FIFO[6][11];
+int16_t Gx_offset = 0, Gy_offset = 0, Gz_offset = 0;
 
-int16_t  MPU6050_FIFO[6][11];
-int16_t Gx_offset=0,Gy_offset=0,Gz_offset=0;
-
-
-/**************************ÊµÏÖº¯Êı********************************************
-*º¯ÊıÔ­ĞÍ:		void  MPU6050_newValues(int16_t ax,int16_t ay,int16_t az,int16_t gx,int16_t gy,int16_t gz)
-*¹¦¡¡¡¡ÄÜ:	    ½«ĞÂµÄADCÊı¾İ¸üĞÂµ½ FIFOÊı×é£¬½øĞĞÂË²¨´¦Àí
-*******************************************************************************/
-
-void  MPU6050_newValues(int16_t ax,int16_t ay,int16_t az,int16_t gx,int16_t gy,int16_t gz)
+/**************************************************************************
+å‡½æ•°å: MPU6050_newValues
+æè¿°  : å°†æ–°ADCæ•°æ®æ›´æ–°åˆ°FIFOæ•°ç»„è¿›è¡Œæ»¤æ³¢
+è¾“å…¥  : ax, ay, az - x, y, zè½´åŠ é€Ÿåº¦æ•°æ®ï¼›gx, gy, gz - x, y, zè½´è§’åŠ é€Ÿåº¦æ•°æ®
+è¾“å‡º  : æ— 
+è¯´æ˜  :
+ - å°†æ–°çš„ADCæ•°æ®æ›´æ–°åˆ°FIFOæ•°ç»„è¿›è¡Œæ»¤æ³¢å¤„ç†ã€‚
+**************************************************************************/
+void MPU6050_newValues(int16_t ax, int16_t ay, int16_t az, int16_t gx, int16_t gy, int16_t gz)
 {
-unsigned char i ;
-int32_t sum=0;
-for(i=1;i<10;i++){	//FIFO ²Ù×÷
-MPU6050_FIFO[0][i-1]=MPU6050_FIFO[0][i];
-MPU6050_FIFO[1][i-1]=MPU6050_FIFO[1][i];
-MPU6050_FIFO[2][i-1]=MPU6050_FIFO[2][i];
-MPU6050_FIFO[3][i-1]=MPU6050_FIFO[3][i];
-MPU6050_FIFO[4][i-1]=MPU6050_FIFO[4][i];
-MPU6050_FIFO[5][i-1]=MPU6050_FIFO[5][i];
-}
-MPU6050_FIFO[0][9]=ax;//½«ĞÂµÄÊı¾İ·ÅÖÃµ½ Êı¾İµÄ×îºóÃæ
-MPU6050_FIFO[1][9]=ay;
-MPU6050_FIFO[2][9]=az;
-MPU6050_FIFO[3][9]=gx;
-MPU6050_FIFO[4][9]=gy;
-MPU6050_FIFO[5][9]=gz;
+    unsigned char i;
+    int32_t sum = 0;
+    for (i = 1; i < 10; i++) {  // FIFO æ“ä½œ
+        MPU6050_FIFO[0][i - 1] = MPU6050_FIFO[0][i];
+        MPU6050_FIFO[1][i - 1] = MPU6050_FIFO[1][i];
+        MPU6050_FIFO[2][i - 1] = MPU6050_FIFO[2][i];
+        MPU6050_FIFO[3][i - 1] = MPU6050_FIFO[3][i];
+        MPU6050_FIFO[4][i - 1] = MPU6050_FIFO[4][i];
+        MPU6050_FIFO[5][i - 1] = MPU6050_FIFO[5][i];
+    }
+    MPU6050_FIFO[0][9] = ax;  // å°†æ–°çš„æ•°æ®æ”¾ç½®åˆ°æ•°æ®çš„æœ€åé¢
+    MPU6050_FIFO[1][9] = ay;
+    MPU6050_FIFO[2][9] = az;
+    MPU6050_FIFO[3][9] = gx;
+    MPU6050_FIFO[4][9] = gy;
+    MPU6050_FIFO[5][9] = gz;
 
-sum=0;
-for(i=0;i<10;i++){	//Çóµ±Ç°Êı×éµÄºÏ£¬ÔÙÈ¡Æ½¾ùÖµ
-   sum+=MPU6050_FIFO[0][i];
-}
-MPU6050_FIFO[0][10]=sum/10;
+    sum = 0;
+    for (i = 0; i < 10; i++) {  // æ±‚å½“å‰æ•°ç»„çš„å’Œï¼Œå†å–å¹³å‡å€¼
+        sum += MPU6050_FIFO[0][i];
+    }
+    MPU6050_FIFO[0][10] = sum / 10;
 
-sum=0;
-for(i=0;i<10;i++){
-   sum+=MPU6050_FIFO[1][i];
-}
-MPU6050_FIFO[1][10]=sum/10;
+    sum = 0;
+    for (i = 0; i < 10; i++) {
+        sum += MPU6050_FIFO[1][i];
+    }
+    MPU6050_FIFO[1][10] = sum / 10;
 
-sum=0;
-for(i=0;i<10;i++){
-   sum+=MPU6050_FIFO[2][i];
-}
-MPU6050_FIFO[2][10]=sum/10;
+    sum = 0;
+    for (i = 0; i < 10; i++) {
+        sum += MPU6050_FIFO[2][i];
+    }
+    MPU6050_FIFO[2][10] = sum / 10;
 
-sum=0;
-for(i=0;i<10;i++){
-   sum+=MPU6050_FIFO[3][i];
-}
-MPU6050_FIFO[3][10]=sum/10;
+    sum = 0;
+    for (i = 0; i < 10; i++) {
+        sum += MPU6050_FIFO[3][i];
+    }
+    MPU6050_FIFO[3][10] = sum / 10;
 
-sum=0;
-for(i=0;i<10;i++){
-   sum+=MPU6050_FIFO[4][i];
-}
-MPU6050_FIFO[4][10]=sum/10;
+    sum = 0;
+    for (i = 0; i < 10; i++) {
+        sum += MPU6050_FIFO[4][i];
+    }
+    MPU6050_FIFO[4][10] = sum / 10;
 
-sum=0;
-for(i=0;i<10;i++){
-   sum+=MPU6050_FIFO[5][i];
+    sum = 0;
+    for (i = 0; i < 10; i++) {
+        sum += MPU6050_FIFO[5][i];
+    }
+    MPU6050_FIFO[5][10] = sum / 10;
 }
-MPU6050_FIFO[5][10]=sum/10;
-}
-
-/**************************ÊµÏÖº¯Êı********************************************
-*º¯ÊıÔ­ĞÍ:		void MPU6050_setClockSource(uint8_t source)
-*¹¦¡¡¡¡ÄÜ:	    ÉèÖÃ  MPU6050 µÄÊ±ÖÓÔ´
- * CLK_SEL | Clock Source
- * --------+--------------------------------------
- * 0       | Internal oscillator
- * 1       | PLL with X Gyro reference
- * 2       | PLL with Y Gyro reference
- * 3       | PLL with Z Gyro reference
- * 4       | PLL with external 32.768kHz reference
- * 5       | PLL with external 19.2MHz reference
- * 6       | Reserved
- * 7       | Stops the clock and keeps the timing generator in reset
-*******************************************************************************/
-void MPU6050_setClockSource(uint8_t source){
-    IICwriteBits(devAddr, MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH, source);
-
+/**************************************************************************
+å‡½æ•°å: MPU6050_setClockSource
+æè¿°  : è®¾ç½®MPU6050çš„æ—¶é’Ÿæº
+è¾“å…¥  : source - æ—¶é’Ÿæºç¼–å·
+è¾“å‡º  : æ— 
+è¯´æ˜  :
+ - è®¾ç½®MPU6050çš„æ—¶é’Ÿæºã€‚
+**************************************************************************/
+void MPU6050_setClockSource(uint8_t source)
+{
+    IICwriteBits(MPU6050_ADDRESS, MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH, source);
 }
 
-/** Set full-scale gyroscope range.
- * @param range New full-scale gyroscope range value
- * @see getFullScaleRange()
- * @see MPU6050_GYRO_FS_250
- * @see MPU6050_RA_GYRO_CONFIG
- * @see MPU6050_GCONFIG_FS_SEL_BIT
- * @see MPU6050_GCONFIG_FS_SEL_LENGTH
- */
-void MPU6050_setFullScaleGyroRange(uint8_t range) {
-    IICwriteBits(devAddr, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, range);
+/**************************************************************************
+å‡½æ•°å: MPU6050_setFullScaleGyroRange
+æè¿°  : è®¾ç½®é™€èºä»ªçš„å…¨é‡ç¨‹èŒƒå›´
+è¾“å…¥  : range - æ–°çš„å…¨é‡ç¨‹èŒƒå›´å€¼
+è¾“å‡º  : æ— 
+è¯´æ˜  :
+ - è®¾ç½®MPU6050é™€èºä»ªçš„å…¨é‡ç¨‹èŒƒå›´ã€‚
+**************************************************************************/
+void MPU6050_setFullScaleGyroRange(uint8_t range)
+{
+    IICwriteBits(MPU6050_ADDRESS, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, range);
 }
 
-/**************************ÊµÏÖº¯Êı********************************************
-*º¯ÊıÔ­ĞÍ:		void MPU6050_setFullScaleAccelRange(uint8_t range)
-*¹¦¡¡¡¡ÄÜ:	    ÉèÖÃ  MPU6050 ¼ÓËÙ¶È¼ÆµÄ×î´óÁ¿³Ì
-*******************************************************************************/
-void MPU6050_setFullScaleAccelRange(uint8_t range) {
-    IICwriteBits(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_AFS_SEL_BIT, MPU6050_ACONFIG_AFS_SEL_LENGTH, range);
+/**************************************************************************
+å‡½æ•°å: MPU6050_setFullScaleAccelRange
+æè¿°  : è®¾ç½®MPU6050åŠ é€Ÿåº¦è®¡çš„æœ€å¤§é‡ç¨‹
+è¾“å…¥  : range - åŠ é€Ÿåº¦æœ€å¤§é‡ç¨‹ç¼–å·
+è¾“å‡º  : æ— 
+**************************************************************************/
+void MPU6050_setFullScaleAccelRange(uint8_t range)
+{
+    IICwriteBits(MPU6050_ADDRESS, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_AFS_SEL_BIT, MPU6050_ACONFIG_AFS_SEL_LENGTH, range);
 }
 
-/**************************ÊµÏÖº¯Êı********************************************
-*º¯ÊıÔ­ĞÍ:		void MPU6050_setSleepEnabled(uint8_t enabled)
-*¹¦¡¡¡¡ÄÜ:	    ÉèÖÃ  MPU6050 ÊÇ·ñ½øÈëË¯ÃßÄ£Ê½
-				enabled =1   Ë¯¾õ
-			    enabled =0   ¹¤×÷
-*******************************************************************************/
-void MPU6050_setSleepEnabled(uint8_t enabled) {
-    IICwriteBit(devAddr, MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, enabled);
+/**************************************************************************
+å‡½æ•°å: MPU6050_setSleepEnabled
+æè¿°  : è®¾ç½®MPU6050æ˜¯å¦è¿›å…¥ç¡çœ æ¨¡å¼
+è¾“å…¥  : enable - 1: ç¡çœ ; 0: å·¥ä½œ
+è¾“å‡º  : æ— 
+**************************************************************************/
+void MPU6050_setSleepEnabled(uint8_t enabled)
+{
+    IICwriteBit(MPU6050_ADDRESS, MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, enabled);
 }
 
-/**************************ÊµÏÖº¯Êı********************************************
-*º¯ÊıÔ­ĞÍ:		uint8_t MPU6050_getDeviceID(void)
-*¹¦¡¡¡¡ÄÜ:	    ¶ÁÈ¡  MPU6050 WHO_AM_I ±êÊ¶	 ½«·µ»Ø 0x68
-*******************************************************************************/
-uint8_t MPU6050_getDeviceID(void) {
-
-    IICreadBytes(devAddr, MPU6050_RA_WHO_AM_I, 1, buffer);
+/**************************************************************************
+å‡½æ•°å: MPU6050_getDeviceID
+æè¿°  : è¯»å–MPU6050çš„è®¾å¤‡ID
+è¾“å…¥  : æ— 
+è¾“å‡º  : 0x68
+**************************************************************************/
+uint8_t MPU6050_getDeviceID(void)
+{
+    IICreadBytes(MPU6050_ADDRESS, MPU6050_RA_WHO_AM_I, 1, buffer);
     return buffer[0];
 }
 
-/**************************ÊµÏÖº¯Êı********************************************
-*º¯ÊıÔ­ĞÍ:		uint8_t MPU6050_testConnection(void)
-*¹¦¡¡¡¡ÄÜ:	    ¼ì²âMPU6050 ÊÇ·ñÒÑ¾­Á¬½Ó
-*******************************************************************************/
-uint8_t MPU6050_testConnection(void) {
-   if(MPU6050_getDeviceID() == 0x68)  //0b01101000;
-   return 1;
-   	else return 0;
-}
-
-/**************************ÊµÏÖº¯Êı********************************************
-*º¯ÊıÔ­ĞÍ:		void MPU6050_setI2CMasterModeEnabled(uint8_t enabled)
-*¹¦¡¡¡¡ÄÜ:	    ÉèÖÃ MPU6050 ÊÇ·ñÎªAUX I2CÏßµÄÖ÷»ú
-*******************************************************************************/
-void MPU6050_setI2CMasterModeEnabled(uint8_t enabled) {
-    IICwriteBit(devAddr, MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_I2C_MST_EN_BIT, enabled);
-}
-
-/**************************ÊµÏÖº¯Êı********************************************
-*º¯ÊıÔ­ĞÍ:		void MPU6050_setI2CBypassEnabled(uint8_t enabled)
-*¹¦¡¡¡¡ÄÜ:	    ÉèÖÃ MPU6050 ÊÇ·ñÎªAUX I2CÏßµÄÖ÷»ú
-*******************************************************************************/
-void MPU6050_setI2CBypassEnabled(uint8_t enabled) {
-    IICwriteBit(devAddr, MPU6050_RA_INT_PIN_CFG, MPU6050_INTCFG_I2C_BYPASS_EN_BIT, enabled);
-}
-
-/**************************ÊµÏÖº¯Êı********************************************
-*º¯ÊıÔ­ĞÍ:		void MPU6050_initialize(void)
-*¹¦¡¡¡¡ÄÜ:	    ³õÊ¼»¯ 	MPU6050 ÒÔ½øÈë¿ÉÓÃ×´Ì¬¡£
-*******************************************************************************/
-void MPU6050_initialize(void) {
-    MPU6050_setClockSource(MPU6050_CLOCK_PLL_YGYRO); //ÉèÖÃÊ±ÖÓ
-    MPU6050_setFullScaleGyroRange(MPU6050_GYRO_FS_2000);//ÍÓÂİÒÇÁ¿³ÌÉèÖÃ
-    MPU6050_setFullScaleAccelRange(MPU6050_ACCEL_FS_2);	//¼ÓËÙ¶È¶È×î´óÁ¿³Ì +-2G
-    MPU6050_setSleepEnabled(0); //½øÈë¹¤×÷×´Ì¬
-	 MPU6050_setI2CMasterModeEnabled(0);	 //²»ÈÃMPU6050 ¿ØÖÆAUXI2C
-	 MPU6050_setI2CBypassEnabled(0);	 //Ö÷¿ØÖÆÆ÷µÄI2CÓë	MPU6050µÄAUXI2C	Ö±Í¨¹Ø±Õ
+/**************************************************************************
+å‡½æ•°å: MPU6050_testConnection
+æè¿°  : æ£€æŸ¥MPU6050æ˜¯å¦è¿æ¥
+è¾“å…¥  : æ— 
+è¾“å‡º  : 1: å·²è¿æ¥; 0: æœªè¿æ¥
+**************************************************************************/
+uint8_t MPU6050_testConnection(void)
+{
+    if (MPU6050_getDeviceID() == 0x68)  // 0b01101000
+        return 1;
+    else 
+        return 0;
 }
 
 /**************************************************************************
-º¯Êı¹¦ÄÜ£ºMPU6050ÄÚÖÃDMPµÄ³õÊ¼»¯
-Èë¿Ú²ÎÊı£ºÎŞ
-·µ»Ø  Öµ£ºÎŞ
-×÷    Õß£ºÆ½ºâĞ¡³µÖ®¼Ò
+å‡½æ•°å: MPU6050_setI2CMasterModeEnabled
+æè¿°  : è®¾ç½®MPU6050æ˜¯å¦ä¸ºAUX I2Cçº¿çš„ä¸»æœº
+è¾“å…¥  : enable - 1: æ˜¯; 0: å¦
+è¾“å‡º  : æ— 
+**************************************************************************/
+void MPU6050_setI2CMasterModeEnabled(uint8_t enabled)
+{
+    IICwriteBit(MPU6050_ADDRESS, MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_I2C_MST_EN_BIT, enabled);
+}
+
+/**************************************************************************
+å‡½æ•°å: MPU6050_setI2CBypassEnabled
+æè¿°  : è®¾ç½®MPU6050æ˜¯å¦ä¸ºAUX I2Cçº¿çš„ä¸»æœº
+è¾“å…¥  : enable - 1: æ˜¯; 0: å¦
+è¾“å‡º  : æ— 
+**************************************************************************/
+void MPU6050_setI2CBypassEnabled(uint8_t enabled)
+{
+    IICwriteBit(MPU6050_ADDRESS, MPU6050_RA_INT_PIN_CFG, MPU6050_INTCFG_I2C_BYPASS_EN_BIT, enabled);
+}
+/**************************************************************************
+å‡½æ•°å: MPU6050_initialize
+æè¿°  : åˆå§‹åŒ–MPU6050ä»¥è¿›å…¥å¯ç”¨çŠ¶æ€
+è¾“å…¥  : æ— 
+è¾“å‡º  : æ— 
+**************************************************************************/
+void MPU6050_initialize(void)
+{
+    MPU6050_setClockSource(MPU6050_CLOCK_PLL_YGYRO); // è®¾ç½®æ—¶é’Ÿ
+    MPU6050_setFullScaleGyroRange(MPU6050_GYRO_FS_2000); // è®¾ç½®é™€èºä»ªé‡ç¨‹
+    MPU6050_setFullScaleAccelRange(MPU6050_ACCEL_FS_2); // è®¾ç½®åŠ é€Ÿåº¦è®¡æœ€å¤§é‡ç¨‹ +-2G
+    MPU6050_setSleepEnabled(0); // è¿›å…¥å·¥ä½œçŠ¶æ€
+    MPU6050_setI2CMasterModeEnabled(0); // ä¸è®©MPU6050æ§åˆ¶AUX I2C
+    MPU6050_setI2CBypassEnabled(0); // ä¸»æ§åˆ¶å™¨çš„I2Cä¸MPU6050çš„AUX I2Cç›´é€šå…³é—­
+}
+/**************************************************************************
+å‡½æ•°å: DMP_Init
+æè¿°  : åˆå§‹åŒ–MPU6050å†…ç½®DMP
+è¾“å…¥  : æ— 
+è¾“å‡º  : æ— 
 **************************************************************************/
 void DMP_Init(void)
 { 
-   u8 temp[1]={0};
-   i2cRead(0x68,0x75,1,temp);
-	 Flag_Show=1;
-	 printf("mpu_set_sensor complete ......\r\n");
-	if(temp[0]!=0x68)NVIC_SystemReset();
-	if(!mpu_init())
-  {
-	  if(!mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL))
-	  	 printf("mpu_set_sensor complete ......\r\n");
-	  if(!mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL))
-	  	 printf("mpu_configure_fifo complete ......\r\n");
-	  if(!mpu_set_sample_rate(DEFAULT_MPU_HZ))
-	  	 printf("mpu_set_sample_rate complete ......\r\n");
-	  if(!dmp_load_motion_driver_firmware())
-	  	printf("dmp_load_motion_driver_firmware complete ......\r\n");
-	  if(!dmp_set_orientation(inv_orientation_matrix_to_scalar(gyro_orientation)))
-	  	 printf("dmp_set_orientation complete ......\r\n");
-	  if(!dmp_enable_feature(DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_TAP |
-	        DMP_FEATURE_ANDROID_ORIENT | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO |
-	        DMP_FEATURE_GYRO_CAL))
-	  	 printf("dmp_enable_feature complete ......\r\n");
-	  if(!dmp_set_fifo_rate(DEFAULT_MPU_HZ))
-	  	 printf("dmp_set_fifo_rate complete ......\r\n");
-	  run_self_test();
-	  if(!mpu_set_dmp_state(1))
-	  	 printf("mpu_set_dmp_state complete ......\r\n");
-  }
-	Flag_Show=0;
-
+    u8 temp[1] = {0};
+//    Flag_Show = 1;
+    i2cRead(MPU6050_ADDRESS, MPU6050_RA_WHO_AM_I, 1, temp);
+    printf("mpu_set_sensor complete ......\r\n");
+    if (temp[0] != 0x68) NVIC_SystemReset();
+    if (!mpu_init()) {
+        if (!mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL))
+            printf("mpu_set_sensor complete ......\r\n");
+        if (!mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL))
+            printf("mpu_configure_fifo complete ......\r\n");
+        if (!mpu_set_sample_rate(DEFAULT_MPU_HZ))
+            printf("mpu_set_sample_rate complete ......\r\n");
+        if (!dmp_load_motion_driver_firmware())
+            printf("dmp_load_motion_driver_firmware complete ......\r\n");
+        if (!dmp_set_orientation(inv_orientation_matrix_to_scalar(gyro_orientation)))
+            printf("dmp_set_orientation complete ......\r\n");
+        if (!dmp_enable_feature(DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_TAP |
+                                DMP_FEATURE_ANDROID_ORIENT | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO |
+                                DMP_FEATURE_GYRO_CAL))
+            printf("dmp_enable_feature complete ......\r\n");
+        if (!dmp_set_fifo_rate(DEFAULT_MPU_HZ))
+            printf("dmp_set_fifo_rate complete ......\r\n");
+        run_self_test();
+        if (!mpu_set_dmp_state(1))
+            printf("mpu_set_dmp_state complete ......\r\n");
+    }
+//    Flag_Show = 0;
 }
 /**************************************************************************
-º¯Êı¹¦ÄÜ£º¶ÁÈ¡MPU6050ÄÚÖÃDMPµÄ×ËÌ¬ĞÅÏ¢
-Èë¿Ú²ÎÊı£ºÎŞ
-·µ»Ø  Öµ£ºÎŞ
-×÷    Õß£ºÆ½ºâĞ¡³µÖ®¼Ò
+å‡½æ•°å: Read_DMP
+æè¿°  : è¯»å–MPU6050å†…ç½®DMPçš„å§¿æ€ä¿¡æ¯
+è¾“å…¥  : æ— 
+è¾“å‡º  : æ— 
 **************************************************************************/
 void Read_DMP(void)
 {	
-	  unsigned long sensor_timestamp;
-		unsigned char more;
-		long quat[4];
+    unsigned long sensor_timestamp;
+    unsigned char more;
+    long quat[4];
 
-				dmp_read_fifo(gyro, accel, quat, &sensor_timestamp, &sensors, &more);		
-				if (sensors & INV_WXYZ_QUAT )
-				{    
-					 q0=quat[0] / q30;
-					 q1=quat[1] / q30;
-					 q2=quat[2] / q30;
-					 q3=quat[3] / q30;
-					 Pitch = asin(-2 * q1 * q3 + 2 * q0* q2)* 57.3; 	
-					 Roll = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)* 57.3; // roll
-				}
-
+    dmp_read_fifo(gyro, accel, quat, &sensor_timestamp, &sensors, &more); // è¯»å–DMPæ•°æ®
+    if (sensors & INV_WXYZ_QUAT) {    
+        q0 = quat[0] / q30;
+        q1 = quat[1] / q30;
+        q2 = quat[2] / q30;
+        q3 = quat[3] / q30; // å››å…ƒæ•°
+        Roll = asin(-2 * q1 * q3 + 2 * q0 * q2) * 57.3; // è®¡ç®—æ¨ªæ»šè§’
+        Pitch = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2 * q2 + 1) * 57.3; // è®¡ç®—ä¿¯ä»°è§’
+        Yaw = atan2(2 * (q1 * q2 + q0 * q3), q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) * 57.3; // è®¡ç®—åèˆªè§’
+    }
 }
 /**************************************************************************
-º¯Êı¹¦ÄÜ£º¶ÁÈ¡MPU6050ÄÚÖÃÎÂ¶È´«¸ĞÆ÷Êı¾İ
-Èë¿Ú²ÎÊı£ºÎŞ
-·µ»Ø  Öµ£ºÉãÊÏÎÂ¶È
-×÷    Õß£ºÆ½ºâĞ¡³µÖ®¼Ò
+å‡½æ•°å: Read_Temperature
+æè¿°  : è¯»å–MPU6050å†…ç½®æ¸©åº¦ä¼ æ„Ÿå™¨æ•°æ®
+è¾“å…¥  : æ— 
+è¾“å‡º  : æ‘„æ°æ¸©åº¦
 **************************************************************************/
 int Read_Temperature(void)
 {	   
-	  float Temp;
-	  Temp=(I2C_ReadOneByte(devAddr,MPU6050_RA_TEMP_OUT_H)<<8)+I2C_ReadOneByte(devAddr,MPU6050_RA_TEMP_OUT_L);
-		if(Temp>32768) Temp-=65536;
-		Temp=(36.53+Temp/340)*10;
-	  return (int)Temp;
+    float Temp;
+    Temp = (I2C_ReadOneByte(MPU6050_ADDRESS, MPU6050_RA_TEMP_OUT_H) << 8) + I2C_ReadOneByte(MPU6050_ADDRESS, MPU6050_RA_TEMP_OUT_L);
+    if (Temp > 32768) Temp -= 65536; // æ•°æ®ç±»å‹è½¬æ¢
+    Temp = (36.53 + Temp / 340) * 10; // æ¸©åº¦æ”¾å¤§åå€å­˜æ”¾
+    return (int)Temp;
 }
-//------------------End of File----------------------------

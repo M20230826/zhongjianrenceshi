@@ -1,90 +1,42 @@
- 
 #include "DataScope_DP.h"
-  /**************************************************************************
-×÷Õß£ºÆ½ºâĞ¡³µÖ®¼Ò
-ÎÒµÄÌÔ±¦Ğ¡µê£ºhttp://shop114407458.taobao.com/
+
+unsigned char DataScope_OutPut_Buffer[42] = {0}; // è¾“å‡ºç¼“å†²åŒº
+
+/**************************************************************************
+å‡½æ•°åŠŸèƒ½: å°†å•ç²¾åº¦æµ®ç‚¹æ•°æ®è½¬æ¢ä¸º4å­—èŠ‚æ•°æ®å¹¶å­˜å‚¨åœ¨æŒ‡å®šåœ°å€
+è¾“å…¥å‚æ•°: target: ç›®æ ‡å•ç²¾åº¦æ•°æ®
+          buf: è¦å†™å…¥çš„æ•°ç»„
+          beg: æŒ‡å®šä»æ•°ç»„çš„å“ªä¸ªå…ƒç´ å¼€å§‹å†™å…¥
+è¾“å‡ºå‚æ•°: æ— 
 **************************************************************************/
-unsigned char DataScope_OutPut_Buffer[42] = {0};	   //´®¿Ú·¢ËÍ»º³åÇø
-
-
-//º¯ÊıËµÃ÷£º½«µ¥¾«¶È¸¡µãÊı¾İ×ª³É4×Ö½ÚÊı¾İ²¢´æÈëÖ¸¶¨µØÖ· 
-//¸½¼ÓËµÃ÷£ºÓÃ»§ÎŞĞèÖ±½Ó²Ù×÷´Ëº¯Êı 
-//target:Ä¿±êµ¥¾«¶ÈÊı¾İ
-//buf:´ıĞ´ÈëÊı×é
-//beg:Ö¸¶¨´ÓÊı×éµÚ¼¸¸öÔªËØ¿ªÊ¼Ğ´Èë
-//º¯ÊıÎŞ·µ»Ø 
-void Float2Byte(float *target,unsigned char *buf,unsigned char beg)
-{
-    unsigned char *point;
-    point = (unsigned char*)target;	  //µÃµ½floatµÄµØÖ·
-    buf[beg]   = point[0];
-    buf[beg+1] = point[1];
-    buf[beg+2] = point[2];
-    buf[beg+3] = point[3];
-}
- 
- 
-//º¯ÊıËµÃ÷£º½«´ı·¢ËÍÍ¨µÀµÄµ¥¾«¶È¸¡µãÊı¾İĞ´Èë·¢ËÍ»º³åÇø
-//Data£ºÍ¨µÀÊı¾İ
-//Channel£ºÑ¡ÔñÍ¨µÀ£¨1-10£©
-//º¯ÊıÎŞ·µ»Ø 
-void DataScope_Get_Channel_Data(float Data,unsigned char Channel)
-{
-	if ( (Channel > 10) || (Channel == 0) ) return;  //Í¨µÀ¸öÊı´óÓÚ10»òµÈÓÚ0£¬Ö±½ÓÌø³ö£¬²»Ö´ĞĞº¯Êı
-  else
-  {
-     switch (Channel)
-		{
-      case 1:  Float2Byte(&Data,DataScope_OutPut_Buffer,1); break;
-      case 2:  Float2Byte(&Data,DataScope_OutPut_Buffer,5); break;
-		  case 3:  Float2Byte(&Data,DataScope_OutPut_Buffer,9); break;
-		  case 4:  Float2Byte(&Data,DataScope_OutPut_Buffer,13); break;
-		  case 5:  Float2Byte(&Data,DataScope_OutPut_Buffer,17); break;
-		  case 6:  Float2Byte(&Data,DataScope_OutPut_Buffer,21); break;
-		  case 7:  Float2Byte(&Data,DataScope_OutPut_Buffer,25); break;
-		  case 8:  Float2Byte(&Data,DataScope_OutPut_Buffer,29); break;
-		  case 9:  Float2Byte(&Data,DataScope_OutPut_Buffer,33); break;
-		  case 10: Float2Byte(&Data,DataScope_OutPut_Buffer,37); break;
-		}
-  }	 
+void Float2Byte(float *target, unsigned char *buf, unsigned char beg) {
+    unsigned char *point = (unsigned char*)target; // è·å–floatçš„å­—èŠ‚åœ°å€
+    for (unsigned char i = 0; i < 4; i++) {
+        buf[beg + i] = point[i];
+    }
 }
 
-
-//º¯ÊıËµÃ÷£ºÉú³É DataScopeV1.0 ÄÜÕıÈ·Ê¶±ğµÄÖ¡¸ñÊ½
-//Channel_Number£¬ĞèÒª·¢ËÍµÄÍ¨µÀ¸öÊı
-//·µ»Ø·¢ËÍ»º³åÇøÊı¾İ¸öÊı
-//·µ»Ø0±íÊ¾Ö¡¸ñÊ½Éú³ÉÊ§°Ü 
-unsigned char DataScope_Data_Generate(unsigned char Channel_Number)
-{
-	if ( (Channel_Number > 10) || (Channel_Number == 0) ) { return 0; }  //Í¨µÀ¸öÊı´óÓÚ10»òµÈÓÚ0£¬Ö±½ÓÌø³ö£¬²»Ö´ĞĞº¯Êı
-  else
-  {	
-	 DataScope_OutPut_Buffer[0] = '$';  //Ö¡Í·
-		
-	 switch(Channel_Number)   
-   { 
-		 case 1:   DataScope_OutPut_Buffer[5]  =  5; return  6;  
-		 case 2:   DataScope_OutPut_Buffer[9]  =  9; return 10;
-		 case 3:   DataScope_OutPut_Buffer[13] = 13; return 14; 
-		 case 4:   DataScope_OutPut_Buffer[17] = 17; return 18;
-		 case 5:   DataScope_OutPut_Buffer[21] = 21; return 22;  
-		 case 6:   DataScope_OutPut_Buffer[25] = 25; return 26;
-		 case 7:   DataScope_OutPut_Buffer[29] = 29; return 30; 
-		 case 8:   DataScope_OutPut_Buffer[33] = 33; return 34; 
-		 case 9:   DataScope_OutPut_Buffer[37] = 37; return 38;
-     case 10:  DataScope_OutPut_Buffer[41] = 41; return 42; 
-   }	 
-  }
-	return 0;
+/**************************************************************************
+å‡½æ•°åŠŸèƒ½: å°†è¦å‘é€çš„é€šé“çš„å•ç²¾åº¦æµ®ç‚¹æ•°æ®å†™å…¥å‘é€ç¼“å†²åŒº
+è¾“å…¥å‚æ•°: data: é€šé“æ•°æ®
+          channel: é€‰æ‹©é€šé“ (1-10)
+è¾“å‡ºå‚æ•°: æ— 
+**************************************************************************/
+void DataScope_Get_Channel_Data(float data, unsigned char channel) {
+    if (channel < 1 || channel > 10) return; // é€šé“å·å¿…é¡»åœ¨1åˆ°10ä¹‹é—´
+    Float2Byte(&data, DataScope_OutPut_Buffer, 1 + (channel - 1) * 4);
 }
 
+/**************************************************************************
+å‡½æ•°åŠŸèƒ½: ç”ŸæˆDataScope v1.0å¯ä»¥æ­£ç¡®è¯†åˆ«çš„å¸§æ ¼å¼
+è¾“å…¥å‚æ•°: channel_number: è¦å‘é€çš„é€šé“æ•°é‡
+è¾“å‡ºå‚æ•°: è¿”å›å‘é€ç¼“å†²åŒºæ•°æ®çš„æ•°é‡
+**************************************************************************/
+unsigned char DataScope_Data_Generate(unsigned char channel_number) {
+    if (channel_number < 1 || channel_number > 10) return 0; // é€šé“å·å¿…é¡»åœ¨1åˆ°10ä¹‹é—´
 
+    DataScope_OutPut_Buffer[0] = '$'; // å¸§å¤´
+    DataScope_OutPut_Buffer[4 * channel_number + 1] = 4 * channel_number + 1;
 
-
-
-
-
-
-
-
-
+    return 4 * channel_number + 2;
+}
